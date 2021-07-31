@@ -53,6 +53,7 @@ namespace CppCLRWinformsProjekt {
 
 	private: System::Windows::Forms::TextBox^ textBox1;
 	private: System::Windows::Forms::Button^ Disconnect;
+	private: System::Windows::Forms::Timer^ PingTimer;
 
 
 
@@ -90,6 +91,7 @@ namespace CppCLRWinformsProjekt {
 			this->Start = (gcnew System::Windows::Forms::Button());
 			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
 			this->Disconnect = (gcnew System::Windows::Forms::Button());
+			this->PingTimer = (gcnew System::Windows::Forms::Timer(this->components));
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numericUpDown1))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numericUpDown2))->BeginInit();
 			this->SuspendLayout();
@@ -238,6 +240,10 @@ namespace CppCLRWinformsProjekt {
 			this->Disconnect->UseVisualStyleBackColor = true;
 			this->Disconnect->Click += gcnew System::EventHandler(this, &Form1::onDisconnectClick);
 			// 
+			// PingTimer
+			// 
+			this->PingTimer->Tick += gcnew System::EventHandler(this, &Form1::pingTimerEvent);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
@@ -293,6 +299,7 @@ namespace CppCLRWinformsProjekt {
 						this->Start->Enabled = true; // start
 						this->Disconnect->Enabled = true;
 						this->Trigger->Enabled = true;
+						this->PingTimer->Enabled = true;
 					}
 					else {
 						this->textBox1->AppendText("Connection failed\r\n");
@@ -320,6 +327,7 @@ namespace CppCLRWinformsProjekt {
 			this->Start->Enabled = false; // start
 			this->Disconnect->Enabled = false;
 			this->Trigger->Enabled = false;
+			this->PingTimer->Enabled = false;
 			this->progressBar1->Value = 0;
 			this->Trigger->BackColor = System::Drawing::Color::Red;
 			this->Trigger->Text = L"Trigger OFF";
@@ -369,6 +377,10 @@ namespace CppCLRWinformsProjekt {
 		//	msg += '\r';
 		//	this->textBox1->AppendText(msg);
 		//}
+	}
+
+	private: System::Void pingTimerEvent(System::Object^ sender, System::EventArgs^ e) {
+		this->textBox1->AppendText("Ping...\r\n");
 	}
 
 	private: System::Void textBox1_TextChanged(System::Object^ sender, System::EventArgs^ e) {
