@@ -1,30 +1,58 @@
 #pragma once
 #include <stdint.h>
 
+#define PACKET_MAX_SIZE 100
+#define PACKET_START_FLAG 0xFE
+#define PACKET_END_FLAG 0xFF
+
 typedef enum {
-	DEVICE_CMD_LOG_MESSAGE = 0x00U,
-	DEVICE_CMD_START_TEST,
-	DEVICE_CMD_STOP_TEST,
-	DEVICE_CMD_TRIGGER_ENABLE,
-	DEVICE_CMD_TRIGGER_DISABLE,
-	DEVICE_CMD_DEBUG_LOG_ENABLE,
-	DEVICE_CMD_DEBUG_LOG_DISABLE,
-	DEVICE_CMD_PING,
-	DEVICE_CMD_RESET_MCU,
-	DEVICE_CMD_COUNT,
-} DeviceCmd;
+	PACKET_ID_LOG_MESSAGE = 1U,
+	PACKET_ID_START,
+	PACKET_ID_STOP,
+	PACKET_ID_PROPERTY,
+	PACKET_ID_PING,
+	PACKET_ID_RESET_MCU,
+	PACKET_ID_COUNT,
+} PacketId;
+
+typedef enum {
+	PROPERTY_TRIGGER = 1U,
+	PROPERTY_DEBUG_LOG,
+} Property;
 
 #pragma pack(push, 1)
 typedef struct {
-	DeviceCmd id;
-	union {
-		struct {
-			uint32_t periodMs;
-			uint32_t count;
-		};
-	};
-} Command;
-#pragma pack(pop)
+	uint8_t startFlag;
+	uint8_t id;
+	uint8_t len;
+	uint8_t number;
+} Header;
 
-void sendCommand(Command *cmd);
-void parceInData(char* data);
+typedef struct {
+	uint16_t crc;
+	uint8_t stopFlag;
+} Trailer;
+
+typedef struct {
+	uint8_t general[sizeof(Header)];
+	uint16_t periodMin;
+	uint16_t periodMax;
+	uint32_t count;
+	bool randomEnable;
+	uint8_t trailer[sizeof(Trailer)];
+} PacketStart;
+
+typedef struct {
+	uint8_t general[sizeof(Header)];
+	uint8_t property;
+	bool enable;
+	uint8_t trailer[sizeof(Trailer)];
+} PacketProperty;
+
+typedef union {
+	uint8_t data[PACKET_MAX_SIZE];
+	Header general;
+	PacketStart setup;
+	PacketProperty property;
+} Packet;
+#pragma pack(pop)
