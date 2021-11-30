@@ -2,8 +2,6 @@
 #include <stdint.h>
 
 #define PACKET_MAX_SIZE 100
-#define PACKET_START_FLAG 0xFE
-#define PACKET_END_FLAG 0xFF
 
 typedef enum {
 	PACKET_ID_LOG_MESSAGE = 1U,
@@ -11,7 +9,6 @@ typedef enum {
 	PACKET_ID_STOP,
 	PACKET_ID_PROPERTY,
 	PACKET_ID_PING,
-	PACKET_ID_RESET_MCU,
 	PACKET_ID_COUNT,
 } PacketId;
 
@@ -22,7 +19,7 @@ typedef enum {
 
 #pragma pack(push, 1)
 typedef struct {
-	uint8_t startFlag;
+	uint16_t reserved;
 	uint8_t id;
 	uint8_t len;
 	uint8_t number;
@@ -30,7 +27,6 @@ typedef struct {
 
 typedef struct {
 	uint16_t crc;
-	uint8_t stopFlag;
 } Trailer;
 
 typedef struct {

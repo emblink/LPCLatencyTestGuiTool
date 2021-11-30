@@ -1,7 +1,20 @@
 #pragma once
 #include "protocol.h"
+#include "packetProcessor.h"
 #include <cstring>
 #include <stdio.h>
+
+static onSendPacketCb(Packet *packet)
+{
+	String^ msg = gcnew String((char*)&packet);
+	this->serialPort1->Write(msg);
+	this->Log->AppendText(msg);
+}
+
+static onReceivePacketCb(Packet* packet)
+{
+	
+}
 
 namespace CppCLRWinformsProjekt {
 
@@ -68,6 +81,9 @@ namespace CppCLRWinformsProjekt {
 	private: System::Windows::Forms::NumericUpDown^ numericUpDown3;
 	private: System::Windows::Forms::Label^ PeriodMin;
 	private: System::Windows::Forms::Splitter^ splitter1;
+	private: System::Windows::Forms::OpenFileDialog^ openLogFile;
+
+	private: System::Windows::Forms::Button^ SelectFile;
 
 
 
@@ -117,6 +133,8 @@ namespace CppCLRWinformsProjekt {
 			this->numericUpDown3 = (gcnew System::Windows::Forms::NumericUpDown());
 			this->PeriodMin = (gcnew System::Windows::Forms::Label());
 			this->splitter1 = (gcnew System::Windows::Forms::Splitter());
+			this->openLogFile = (gcnew System::Windows::Forms::OpenFileDialog());
+			this->SelectFile = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numericUpDown1))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numericUpDown2))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->numericUpDown3))->BeginInit();
@@ -142,7 +160,7 @@ namespace CppCLRWinformsProjekt {
 			this->Connect->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->Connect->ForeColor = System::Drawing::Color::ForestGreen;
-			this->Connect->Location = System::Drawing::Point(387, 199);
+			this->Connect->Location = System::Drawing::Point(396, 244);
 			this->Connect->Name = L"Connect";
 			this->Connect->Size = System::Drawing::Size(97, 48);
 			this->Connect->TabIndex = 1;
@@ -164,7 +182,7 @@ namespace CppCLRWinformsProjekt {
 			// 
 			this->ResetDevice->Enabled = false;
 			this->ResetDevice->ForeColor = System::Drawing::Color::Red;
-			this->ResetDevice->Location = System::Drawing::Point(524, 253);
+			this->ResetDevice->Location = System::Drawing::Point(533, 298);
 			this->ResetDevice->Name = L"ResetDevice";
 			this->ResetDevice->Size = System::Drawing::Size(97, 48);
 			this->ResetDevice->TabIndex = 3;
@@ -176,7 +194,7 @@ namespace CppCLRWinformsProjekt {
 			// 
 			this->Trigger->BackColor = System::Drawing::Color::Transparent;
 			this->Trigger->Enabled = false;
-			this->Trigger->Location = System::Drawing::Point(387, 253);
+			this->Trigger->Location = System::Drawing::Point(396, 298);
 			this->Trigger->Name = L"Trigger";
 			this->Trigger->Size = System::Drawing::Size(97, 47);
 			this->Trigger->TabIndex = 4;
@@ -186,7 +204,7 @@ namespace CppCLRWinformsProjekt {
 			// 
 			// progressBar1
 			// 
-			this->progressBar1->Location = System::Drawing::Point(370, 374);
+			this->progressBar1->Location = System::Drawing::Point(373, 404);
 			this->progressBar1->Name = L"progressBar1";
 			this->progressBar1->Size = System::Drawing::Size(272, 23);
 			this->progressBar1->TabIndex = 5;
@@ -236,7 +254,7 @@ namespace CppCLRWinformsProjekt {
 			// Start
 			// 
 			this->Start->Enabled = false;
-			this->Start->Location = System::Drawing::Point(387, 306);
+			this->Start->Location = System::Drawing::Point(396, 351);
 			this->Start->Name = L"Start";
 			this->Start->Size = System::Drawing::Size(97, 47);
 			this->Start->TabIndex = 10;
@@ -250,7 +268,7 @@ namespace CppCLRWinformsProjekt {
 			this->Disconnect->Font = (gcnew System::Drawing::Font(L"Microsoft Sans Serif", 8.25F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(0)));
 			this->Disconnect->ForeColor = System::Drawing::Color::Red;
-			this->Disconnect->Location = System::Drawing::Point(524, 199);
+			this->Disconnect->Location = System::Drawing::Point(533, 244);
 			this->Disconnect->Name = L"Disconnect";
 			this->Disconnect->Size = System::Drawing::Size(97, 48);
 			this->Disconnect->TabIndex = 12;
@@ -260,6 +278,7 @@ namespace CppCLRWinformsProjekt {
 			// 
 			// PingTimer
 			// 
+			this->PingTimer->Interval = 1000;
 			this->PingTimer->Tick += gcnew System::EventHandler(this, &Form1::pingTimerEvent);
 			// 
 			// Log
@@ -305,7 +324,7 @@ namespace CppCLRWinformsProjekt {
 			// 
 			// Stop
 			// 
-			this->Stop->Location = System::Drawing::Point(524, 306);
+			this->Stop->Location = System::Drawing::Point(533, 351);
 			this->Stop->Name = L"Stop";
 			this->Stop->Size = System::Drawing::Size(97, 47);
 			this->Stop->TabIndex = 17;
@@ -342,11 +361,26 @@ namespace CppCLRWinformsProjekt {
 			this->splitter1->TabIndex = 20;
 			this->splitter1->TabStop = false;
 			// 
+			// openLogFile
+			// 
+			this->openLogFile->FileName = L"log.txt";
+			// 
+			// SelectFile
+			// 
+			this->SelectFile->Location = System::Drawing::Point(396, 198);
+			this->SelectFile->Name = L"SelectFile";
+			this->SelectFile->Size = System::Drawing::Size(97, 23);
+			this->SelectFile->TabIndex = 21;
+			this->SelectFile->Text = L"SelectLogFile";
+			this->SelectFile->UseVisualStyleBackColor = true;
+			this->SelectFile->Click += gcnew System::EventHandler(this, &Form1::selectLogFile);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(654, 427);
+			this->Controls->Add(this->SelectFile);
 			this->Controls->Add(this->splitter1);
 			this->Controls->Add(this->PeriodMin);
 			this->Controls->Add(this->numericUpDown3);
@@ -489,19 +523,20 @@ namespace CppCLRWinformsProjekt {
 	}
 
 	private: System::Void pingTimerEvent(System::Object^ sender, System::EventArgs^ e) {
-		//Packet packet;
-		//memset(&packet, 0, sizeof(packet));
-		//static uint8_t num = 0;
-		//packet.general.id = PACKET_ID_PING;
-		//packet.general.len = num;
-		//packet.general.terminator = '\n';
-		//String^ msg = gcnew String((char *) packet.data);
-		//this->serialPort1->Write(msg);
-		//char log[50];
-		//sprintf(log, "Ping %u...\r\n", num);
-		//String^ msgLog = gcnew String(log);
-		//this->Log->AppendText(msgLog);
-		//num++;
+		static uint8_t num = 0;
+		Packet packet;
+		packet.general.id = PACKET_ID_PING;
+		packet.general.len = sizeof(Header) + 1;
+		packet.general.number = num;
+		packetProcessorSendPacket(&packet);
+		/*char log[50];
+		sprintf(log, "<< Ping %u...\r\n", num);
+		String^ msgLog = gcnew String(log);
+		this->Log->AppendText(msgLog);
+		sprintf(log, ">> Ping reply %u\r\n", num);
+		String^ serialMsg = gcnew String(log);
+		this->serialPort1->Write(serialMsg);*/
+		num++;
 	}
 
 	private: System::Void Log_TextChanged(System::Object^ sender, System::EventArgs^ e) {
@@ -512,17 +547,23 @@ namespace CppCLRWinformsProjekt {
 	}
 	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
 	}
-private: System::Void label1_Click(System::Object^ sender, System::EventArgs^ e) {
-}
-private: System::Void label2_Click(System::Object^ sender, System::EventArgs^ e) {
-}
-private: System::Void checkBox2_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
-}
+	private: System::Void label1_Click(System::Object^ sender, System::EventArgs^ e) {
+	}
+	private: System::Void label2_Click(System::Object^ sender, System::EventArgs^ e) {
+	}
+	private: System::Void checkBox2_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
+	}
 	private: System::Void ClearLog_Click(System::Object^ sender, System::EventArgs^ e) {
 		this->Log->Clear();
 	}
 
-private: System::Void PeriodMin_Click(System::Object^ sender, System::EventArgs^ e) {
-}
+	private: System::Void PeriodMin_Click(System::Object^ sender, System::EventArgs^ e) {
+	}
+
+	private: System::Void selectLogFile(System::Object^ sender, System::EventArgs^ e) {
+		this->openLogFile->ShowDialog();
+		//String^ logFile = gcnew this->openLogFile->FileName; TODO: ****
+		//String^ msg = gcnew String((char*)packet.data);
+	}
 };
 }

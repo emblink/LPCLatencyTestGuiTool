@@ -32,6 +32,12 @@
     <ClInclude Include="protocol.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="packetProcessor.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="cobsEncoder.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CppCLR_WinformsProjekt.cpp">
@@ -47,6 +53,12 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="protocol.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="packetProcessor.c">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="cobsEncoder.c">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
